@@ -196,9 +196,9 @@ impl<'a> Deck<'a> {
         ret
     }
 
-    pub fn find_type(&mut self, card_type: CardType) -> Option<Card<'a>> {
+    pub fn find_type(&mut self, card_type: &CardType) -> Option<Card<'a>> {
         for (i, card) in self.cards.iter().enumerate() {
-            if *card.card_type == card_type {
+            if card.card_type == card_type {
                 let ret = self.cards.remove(i);
                 return Some(ret);
             }
