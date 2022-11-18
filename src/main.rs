@@ -48,8 +48,8 @@ fn main() {
         println!("You burn {}", pairs);
         player1.burn_pile.give_deck(&mut pairs);
 
-        if player1.hand.cards.len() == 0 {
-            println!("YOU WIN!");
+        if player1.hand.cards.is_empty() {
+            println!("Your hand is empty!");
             break;
         }
 
@@ -61,8 +61,8 @@ fn main() {
         );
         player2.burn_pile.give_deck(&mut pairs);
 
-        if player2.hand.cards.len() == 0 {
-            println!("COMPUTER WINS!");
+        if player2.hand.cards.is_empty() {
+            println!("Computer's hand is empty!");
             break;
         }
 
@@ -79,11 +79,16 @@ fn main() {
                         println!("You get the {}!", card);
                         card
                     }
-                    None => {
-                        let next = deck.take_card();
-                        println!("GO FISH! You take the {} from the deck", next);
-                        next
-                    }
+                    None => match deck.take_card() {
+                        Some(next) => {
+                            println!("GO FISH! You take the {} from the deck", next);
+                            next
+                        }
+                        None => {
+                            println!("GO FISH! No more cards in the deck!");
+                            break;
+                        }
+                    },
                 };
 
                 player1.hand.give_card(next_card);
@@ -104,16 +109,33 @@ fn main() {
                 println!("You give the computer the {}", card);
                 card
             }
-            None => {
-                let next = deck.take_card();
-                println!("GO FISH! Computer takes a card from the deck");
-                next
-            }
+            None => match deck.take_card() {
+                Some(next) => {
+                    println!("GO FISH! Computer takes a card from the deck");
+                    next
+                }
+                None => {
+                    println!("GO FISH! No more cards in the deck!");
+                    break;
+                }
+            },
         };
 
         player2.hand.give_card(p1_card);
 
         thread::sleep(time::Duration::from_secs(1));
         println!();
+    }
+
+    let player_score = player1.burn_pile.cards.len() / 2;
+    let cpu_score = player2.burn_pile.cards.len() / 2;
+
+    println!("Your score: {}", player_score);
+    println!("Computer score: {}", cpu_score);
+
+    if player_score > cpu_score {
+        println!("YOU WIN!");
+    } else {
+        println!("COMPUTER WINS!");
     }
 }

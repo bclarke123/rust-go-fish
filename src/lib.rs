@@ -149,8 +149,11 @@ impl<'a> Deck<'a> {
         cards.sort();
     }
 
-    pub fn take_card(&mut self) -> Card<'a> {
-        self.cards.remove(0)
+    pub fn take_card(&mut self) -> Option<Card<'a>> {
+        match self.cards.len() {
+            0 => None,
+            _ => Some(self.cards.remove(0)),
+        }
     }
 
     pub fn give_card(&mut self, card: Card<'a>) {
@@ -166,7 +169,7 @@ impl<'a> Deck<'a> {
     }
 
     pub fn pairs(&mut self) -> Deck<'a> {
-        self.cards.sort_by(|a, b| a.card_type.cmp(&b.card_type));
+        self.cards.sort_by(|a, b| a.card_type.cmp(b.card_type));
 
         let mut pairs = vec![];
         let mut i = 1;
@@ -230,6 +233,12 @@ impl<'a> Display for Deck<'a> {
     }
 }
 
+impl<'a> Default for Deck<'a> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug)]
 pub struct Player<'a> {
     pub hand: Deck<'a>,
@@ -241,5 +250,11 @@ impl<'a> Player<'a> {
         let hand = Deck::empty();
         let burn_pile = Deck::empty();
         Player { hand, burn_pile }
+    }
+}
+
+impl<'a> Default for Player<'a> {
+    fn default() -> Self {
+        Self::new()
     }
 }
