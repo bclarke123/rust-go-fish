@@ -4,10 +4,13 @@ use rand::Rng;
 use std::io;
 use std::{thread, time};
 
-fn read_cmd() -> Option<String> {
+fn read_cmd() -> Option<char> {
     let mut buf = String::new();
     match io::stdin().read_line(&mut buf) {
-        Ok(_) => Some(buf),
+        Ok(_) => {
+            let c = buf.chars().next().unwrap();
+            Some(c)
+        }
         Err(_) => None,
     }
 }
@@ -35,42 +38,32 @@ fn main() {
     let mut deck = Deck::new();
     let mut player1 = Player::new();
     let mut player2 = Player::new();
-
-    let mut players = vec![&mut player1, &mut player2];
-
-    deck.shuffle();
-    deck.deal(7, &mut players);
-
     let mut random = rand::thread_rng();
 
-    loop {
-        let mut pairs = player1.hand.pairs();
+    deck.shuffle();
+    deck.deal(7, &mut vec![&mut player1, &mut player2]);
+
+    let mut pairs = player1.hand.pairs();
+    if !pairs.cards.is_empty() {
         println!("You burn {}", pairs);
         player1.burn_pile.give_deck(&mut pairs);
+    }
 
-        if player1.hand.cards.is_empty() {
-            println!("Your hand is empty!");
-            break;
-        }
-
-        let mut pairs = player2.hand.pairs();
-        println!(
-            "Computer burns {} pairs.  Computer has {} cards.",
-            pairs.cards.len() / 2,
-            player2.hand.cards.len()
-        );
+    let mut pairs = player2.hand.pairs();
+    if !pairs.cards.is_empty() {
+        println!("Computer burns {} pairs.", pairs.cards.len() / 2);
         player2.burn_pile.give_deck(&mut pairs);
+    }
 
-        if player2.hand.cards.is_empty() {
-            println!("Computer's hand is empty!");
-            break;
-        }
+    loop {
+        thread::sleep(time::Duration::from_secs(1));
 
+        println!();
+        println!("YOUR TURN");
         println!("PLAYER HAND - {}", player1.hand);
         println!("Which card will you ask for?");
 
-        if let Some(cmd) = read_cmd() {
-            let input = cmd.chars().next().unwrap();
+        if let Some(input) = read_cmd() {
             if let Some(guess) = guess_card_type(input) {
                 println!("You ask for a {}", guess);
 
@@ -92,6 +85,17 @@ fn main() {
                 };
 
                 player1.hand.give_card(next_card);
+
+                let mut pairs = player1.hand.pairs();
+                if !pairs.cards.is_empty() {
+                    println!("You burn {}", pairs);
+                    player1.burn_pile.give_deck(&mut pairs);
+
+                    if player1.hand.cards.is_empty() {
+                        println!("Your hand is empty!");
+                        break;
+                    }
+                }
             }
         }
 
@@ -122,6 +126,19 @@ fn main() {
         };
 
         player2.hand.give_card(p1_card);
+
+        let mut pairs = player2.hand.pairs();
+        if !pairs.cards.is_empty() {
+            println!("Computer burns {} pairs.", pairs.cards.len() / 2);
+            player2.burn_pile.give_deck(&mut pairs);
+
+            if player2.hand.cards.is_empty() {
+                println!("Computer's hand is empty!");
+                break;
+            }
+        }
+
+        println!("Computer has {} cards.", player2.hand.cards.len());
 
         thread::sleep(time::Duration::from_secs(1));
         println!();
