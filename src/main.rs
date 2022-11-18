@@ -42,7 +42,10 @@ fn guess_card_type() -> Option<CardType> {
     }
 }
 
-fn burn(player: &mut Player, cb: Box<dyn Fn(&Deck)>) {
+fn burn<F>(player: &mut Player, cb: F)
+where
+    F: Fn(&Deck),
+{
     let mut pairs = player.hand.pairs();
     if !pairs.cards.is_empty() {
         cb(&pairs);
@@ -77,15 +80,11 @@ impl<'a> GameState<'a> {
         self.deck
             .deal(7, &mut vec![&mut self.player1, &mut self.player2]);
 
-        burn(
-            &mut self.player1,
-            Box::new(|pairs| println!("You burn {}", pairs)),
-        );
+        burn(&mut self.player1, |pairs| println!("You burn {}", pairs));
 
-        burn(
-            &mut self.player2,
-            Box::new(|pairs| println!("Computer burns {} pairs.", pairs.cards.len() / 2)),
-        );
+        burn(&mut self.player2, |pairs| {
+            println!("Computer burns {} pairs.", pairs.cards.len() / 2)
+        });
     }
 
     fn next_player_turn(&mut self) -> bool {
@@ -116,10 +115,7 @@ impl<'a> GameState<'a> {
 
             self.player1.hand.give_card(next_card);
 
-            burn(
-                &mut self.player1,
-                Box::new(|pairs| println!("You burn {}", pairs)),
-            );
+            burn(&mut self.player1, |pairs| println!("You burn {}", pairs));
 
             if self.player1.hand.cards.is_empty() {
                 println!("Your hand is empty!");
@@ -159,10 +155,9 @@ impl<'a> GameState<'a> {
 
         self.player2.hand.give_card(p1_card);
 
-        burn(
-            &mut self.player2,
-            Box::new(|pairs| println!("Computer burns {} pairs.", pairs.cards.len() / 2)),
-        );
+        burn(&mut self.player2, |pairs| {
+            println!("Computer burns {} pairs.", pairs.cards.len() / 2)
+        });
 
         if self.player2.hand.cards.is_empty() {
             println!("Computer's hand is empty!");
