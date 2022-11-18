@@ -55,10 +55,9 @@ fn main() {
         player2.burn_pile.give_deck(&mut pairs);
     }
 
-    loop {
-        thread::sleep(time::Duration::from_secs(1));
+    println!();
 
-        println!();
+    loop {
         println!("YOUR TURN");
         println!("PLAYER HAND - {}", player1.hand);
         println!("Which card will you ask for?");
@@ -146,6 +145,10 @@ fn main() {
 
     let player_score = player1.burn_pile.cards.len() / 2;
     let cpu_score = player2.burn_pile.cards.len() / 2;
+
+    println!();
+    println!("GAME OVER!!");
+    println!();
 
     println!("Your score: {}", player_score);
     println!("Computer score: {}", cpu_score);
