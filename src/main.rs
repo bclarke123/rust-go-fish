@@ -3,36 +3,41 @@ use cards::types::CardGame;
 use cards::utils::read_cmd;
 use std::{thread, time};
 
-fn main() {
-    loop {
-        let mut game = GoFish::new();
-        game.init();
+use macroquad::prelude::*;
 
-        println!();
+#[macroquad::main("Go Fish")]
+async fn main() {
+    let card_atlas = load_texture("textures/cards.png").await.unwrap();
 
-        loop {
-            if !game.next_player_turn() {
-                break;
-            }
+    // loop {
+    //     let mut game = GoFish::new();
+    //     game.init();
 
-            thread::sleep(time::Duration::from_secs(1));
-            println!();
+    //     println!();
 
-            if !game.next_computer_turn() {
-                break;
-            }
+    //     loop {
+    //         if !game.next_player_turn() {
+    //             break;
+    //         }
 
-            thread::sleep(time::Duration::from_secs(1));
-            println!();
-        }
+    //         thread::sleep(time::Duration::from_secs(1));
+    //         println!();
 
-        game.game_over();
+    //         if !game.next_computer_turn() {
+    //             break;
+    //         }
 
-        println!("Play again? y/n");
-        let quit = matches!(read_cmd(), Some('n'));
+    //         thread::sleep(time::Duration::from_secs(1));
+    //         println!();
+    //     }
 
-        if quit {
-            break;
-        }
-    }
+    //     game.game_over();
+
+    //     println!("Play again? y/n");
+    //     let quit = matches!(read_cmd(), Some('n'));
+
+    //     if quit {
+    //         break;
+    //     }
+    // }
 }
